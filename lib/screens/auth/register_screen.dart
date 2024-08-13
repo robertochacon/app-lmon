@@ -25,124 +25,127 @@ class _FormRequestState extends State<RegisterScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
-        child: FormBuilder(
-          key: _formkey,
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  height: 150,
-                  child: Image.asset('assets/images/logo.png'),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 10, right: 10),
-                  child: FormBuilderCustom(
-                    name: 'Cedula', 
-                    obscureText: false, 
-                    hintText: 'Ingrese su cédula', 
-                    validator: FormBuilderValidators.compose([
-                      FormBuilderValidators.required(
-                        errorText: 'Cédula requerida'
-                      )
-                    ]), 
-                    icon: Icons.perm_identity, 
-                    keytype: TextInputType.emailAddress
+        child: Padding(
+          padding: const EdgeInsets.only(top: 50),
+          child: FormBuilder(
+            key: _formkey,
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    height: 150,
+                    child: Image.asset('assets/images/logo.png'),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 10, right: 10),
-                  child: FormBuilderCustom(
-                    name: 'Correo', 
-                    obscureText: false, 
-                    hintText: 'Ingrese su correo', 
-                    validator: FormBuilderValidators.compose([
-                      FormBuilderValidators.required(
-                        errorText: 'Correo requerido'
-                      )
-                    ]), 
-                    icon: Icons.mail, 
-                    keytype: TextInputType.emailAddress
+                  const SizedBox(
+                    height: 20,
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 10, right: 10),
-                  child: FormBuilderCustom(
-                    name: 'Clave', 
-                    obscureText: true, 
-                    hintText: 'Ingrese su clave', 
-                    validator: FormBuilderValidators.compose([
-                      FormBuilderValidators.required(
-                        errorText: 'Clave requerida'
-                      )
-                    ]), 
-                    icon: Icons.key, 
-                    keytype: TextInputType.text
+                  Padding(
+                    padding: const EdgeInsets.only(left: 10, right: 10),
+                    child: FormBuilderCustom(
+                      name: 'Cedula', 
+                      obscureText: false, 
+                      hintText: 'Ingrese su cédula', 
+                      validator: FormBuilderValidators.compose([
+                        FormBuilderValidators.required(
+                          errorText: 'Cédula requerida'
+                        )
+                      ]), 
+                      icon: Icons.perm_identity, 
+                      keytype: TextInputType.emailAddress
+                    ),
                   ),
-                ),
-                const SizedBox(
-                  height: 5,
-                ),
-                ElevatedButton(
-                  onPressed: () async {
-
-                    if (_formkey.currentState?.validate() ?? false) {
-
-                      _formkey.currentState?.save();
-
-                      final identification = _formkey.currentState?.value['Cedula'] ?? '';
-                      final email = _formkey.currentState?.value['Correo'] ?? '';
-                      final password = _formkey.currentState?.value['Clave'] ?? '';
-
-                      try {
-
-                        final response = await _registerService.register(identification, email, password);
-
-                        if (response['token'] != null) {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(builder: (context) => const HomeScreen()),
-                          );
-                        } else {
+                  Padding(
+                    padding: const EdgeInsets.only(left: 10, right: 10),
+                    child: FormBuilderCustom(
+                      name: 'Correo', 
+                      obscureText: false, 
+                      hintText: 'Ingrese su correo', 
+                      validator: FormBuilderValidators.compose([
+                        FormBuilderValidators.required(
+                          errorText: 'Correo requerido'
+                        )
+                      ]), 
+                      icon: Icons.mail, 
+                      keytype: TextInputType.emailAddress
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 10, right: 10),
+                    child: FormBuilderCustom(
+                      name: 'Clave', 
+                      obscureText: true, 
+                      hintText: 'Ingrese su clave', 
+                      validator: FormBuilderValidators.compose([
+                        FormBuilderValidators.required(
+                          errorText: 'Clave requerida'
+                        )
+                      ]), 
+                      icon: Icons.key, 
+                      keytype: TextInputType.text
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  ElevatedButton(
+                    onPressed: () async {
+          
+                      if (_formkey.currentState?.validate() ?? false) {
+          
+                        _formkey.currentState?.save();
+          
+                        final identification = _formkey.currentState?.value['Cedula'] ?? '';
+                        final email = _formkey.currentState?.value['Correo'] ?? '';
+                        final password = _formkey.currentState?.value['Clave'] ?? '';
+          
+                        try {
+          
+                          final response = await _registerService.register(identification, email, password);
+          
+                          if (response['token'] != null) {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (context) => const HomeScreen()),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(response['message'])),
+                            );
+                          }
+                        } catch (e) {
+                          print(e);
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(response['message'])),
+                            const SnackBar(content: Text('Intete mas tarde.', style: TextStyle(fontSize: 20),)),
                           );
                         }
-                      } catch (e) {
-                        print(e);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Intete mas tarde.', style: TextStyle(fontSize: 20),)),
-                        );
                       }
-                    }
-
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    minimumSize: const Size(200, 50),
+          
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      minimumSize: const Size(200, 50),
+                    ),
+                    child: const Text("Registrar", style: TextStyle(color: Colors.white, fontSize: 20),),
                   ),
-                  child: const Text("Registrar", style: TextStyle(color: Colors.white, fontSize: 20),),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                ElevatedButton(
-                  onPressed: (){
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => const LoginScreen()),
-                      );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue[200],
-                    minimumSize: const Size(200, 50),
+                  const SizedBox(
+                    height: 10,
                   ),
-                  child: const Text("Login", style: TextStyle(color: Colors.white, fontSize: 20),),
-                )
-              ],
+                  ElevatedButton(
+                    onPressed: (){
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => const LoginScreen()),
+                        );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue[200],
+                      minimumSize: const Size(200, 50),
+                    ),
+                    child: const Text("Login", style: TextStyle(color: Colors.white, fontSize: 20),),
+                  )
+                ],
+              ),
             ),
           ),
         ) 

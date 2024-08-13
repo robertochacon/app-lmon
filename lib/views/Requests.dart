@@ -8,23 +8,20 @@ class Requests extends StatefulWidget {
 }
 
 class _RequestsState extends State<Requests> {
-
-
-  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: FloatingActionButton(
-            onPressed: (){
-
-
-
-              Navigator.pushNamed(context, '/request');
-            },
-            child: const Icon(Icons.add)),
-          )
-      );
+      body: const Padding(
+        padding: EdgeInsets.all(10.0),
+        child: Text("Solicitudes:"),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.pushNamed(context, '/request');
+        },
+        child: const Icon(Icons.add),
+      ),
+    );
   }
 }
+

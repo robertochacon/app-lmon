@@ -10,7 +10,7 @@ class LoginService {
       final response = await http.post(
         Uri.parse(apiUrl),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'email': email, 'password': password}),
+        body: jsonEncode({'email': 'test@test.com', 'password': 'test'}),
       );
 
       if (response.statusCode == 200) {
