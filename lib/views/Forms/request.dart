@@ -29,7 +29,8 @@ class _FormRequestState extends State<FormRequest> {
       ),
       body: FormBuilder(
         key: _formkey,
-        child: Center(
+        child: Padding(
+          padding: const EdgeInsets.only(left: 10, right: 10),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [

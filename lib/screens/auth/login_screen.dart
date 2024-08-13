@@ -4,6 +4,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:lmon/screens/auth/register_screen.dart';
 import 'package:lmon/screens/main/home_screen.dart';
+import 'package:lmon/services/login.dart';
 
 import '../../customs/form_textfield_build.dart';
 
@@ -17,6 +18,7 @@ class LoginScreen extends StatefulWidget {
 class _FormRequestState extends State<LoginScreen> {
   
   final GlobalKey<FormBuilderState> _formkey = GlobalKey<FormBuilderState>();
+  final LoginService _loginService = LoginService();
 
   @override
   Widget build(BuildContext context) {
@@ -69,20 +71,33 @@ class _FormRequestState extends State<LoginScreen> {
                 height: 5,
               ),
               ElevatedButton(
-                onPressed: (){
+                onPressed: () async {
 
-                  _formkey.currentState?.save();
+                  if (_formkey.currentState?.validate() ?? false) {
+                    _formkey.currentState?.save();
+                    final email = _formkey.currentState?.value['Correo'] ?? '';
+                    final password = _formkey.currentState?.value['Clave'] ?? '';
 
-                  if (_formkey.currentState?.validate() == true) {
-                    final v = _formkey.currentState?.value;
-                    print(v?['Correo']);
-                    print(v?['Clave']);
+                    try {
 
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => const HomeScreen()),
-                    );
+                      final response = await _loginService.login(email, password);
 
+                      if (response['access_token']['token'] != null) {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => const HomeScreen()),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(response['message'])),
+                        );
+                      }
+                    } catch (e) {
+                      print(e);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Credenciales incorrectas', style: TextStyle(fontSize: 20),)),
+                      );
+                    }
                   }
 
                 },
