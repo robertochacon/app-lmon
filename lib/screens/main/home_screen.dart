@@ -30,7 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
         elevation: 10,
         iconTheme: const IconThemeData(
           color: Colors.white,
-          size: 35, // Cambia el color del botón "Back"
+          size: 30, // Cambia el color del botón "Back"
         ),
         actions: [
           IconButton(

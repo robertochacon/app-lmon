@@ -2,6 +2,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:lmon/screens/main/home_screen.dart';
+import 'package:lmon/services/request.dart';
+import 'package:lmon/utils/info_user.dart';
 
 import '../../customs/form_textfield_build.dart';
 
@@ -15,6 +18,7 @@ class FormRequest extends StatefulWidget {
 class _FormRequestState extends State<FormRequest> {
   
   final GlobalKey<FormBuilderState> _formkey = GlobalKey<FormBuilderState>();
+  final RequestService _requestService = RequestService();
 
   @override
   Widget build(BuildContext context) {
@@ -34,55 +38,104 @@ class _FormRequestState extends State<FormRequest> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 10, right: 10),
-                child: FormBuilderCustom(
-                  name: 'Correo', 
-                  obscureText: false, 
-                  hintText: 'Ingrese su correo', 
-                  validator: FormBuilderValidators.compose([
-                    FormBuilderValidators.required(
-                      errorText: 'Monto requerido'
-                    )
-                  ]), 
-                  icon: Icons.mail, 
-                  keytype: TextInputType.emailAddress
+              const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text("¡Préstamo al Instante!", style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 40,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.2,
+                          height: 1.2,
+                          fontFamily: 'Roboto',
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 10, right: 10),
                 child: FormBuilderCustom(
-                  name: 'Clave', 
-                  obscureText: true, 
-                  hintText: 'Ingrese su clave', 
+                  name: 'Monto', 
+                  obscureText: false, 
+                  hintText: 'Ingrese un monto', 
                   validator: FormBuilderValidators.compose([
                     FormBuilderValidators.required(
-                      errorText: 'Clave requerida'
+                      errorText: 'Monto requerido'
+                    ),
+                    FormBuilderValidators.min(
+                      3000,
+                      errorText: 'Monto minimo 3000'
                     )
                   ]), 
-                  icon: Icons.key, 
-                  keytype: TextInputType.text
+                  icon: Icons.monetization_on, 
+                  keytype: TextInputType.number
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 10, right: 10),
+                child: FormBuilderCustom(
+                  name: 'Cuotas', 
+                  obscureText: false, 
+                  hintText: 'Cantidad de cuotas', 
+                  validator: FormBuilderValidators.compose([
+                    FormBuilderValidators.required(
+                      errorText: 'Cuota requerido'
+                    ),
+                    FormBuilderValidators.min(
+                      1,
+                      errorText: 'Cuota minima 1'
+                    )
+                  ]), 
+                  icon: Icons.numbers_outlined, 
+                  keytype: TextInputType.number
                 ),
               ),
               const SizedBox(
                 height: 10,
               ),
               ElevatedButton(
-                onPressed: (){
+                onPressed: () async {
 
-                  _formkey.currentState?.save();
+                    if (_formkey.currentState?.validate() ?? false) {
 
-                  if (_formkey.currentState?.validate() == true) {
-                    final v = _formkey.currentState?.value;
-                    print(v?['Correo']);
-                    print(v?['Clave']);
-                  }
+                      _formkey.currentState?.save();
+
+                      final identification = InfoUser().getIdentification();
+                      final amount = _formkey.currentState?.value['Monto'] ?? 0;
+                      final quotas = _formkey.currentState?.value['Cuotas'] ?? 0;
+                      final total = _formkey.currentState?.value['Monto'] ?? 0;
+
+                      try {
+
+                        final response = await _requestService.register(identification, amount, quotas ,total);
+
+                        if (response['data'] != null) {
+
+                          print(response['data']);
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => const HomeScreen()),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(response['message'])),
+                          );
+                        }
+                      } catch (e) {
+                        print(e);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Intete mas tarde.', style: TextStyle(fontSize: 20),)),
+                        );
+                      }
+                    }
 
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue
+                  backgroundColor: Colors.blue,
+                  minimumSize: const Size(200, 50),
                 ),
-                child: const Text("Solicitar", style: TextStyle(color: Colors.white),),
+                child: const Text("Solicitar", style: TextStyle(color: Colors.white, fontSize: 20),),
               )
               
             ],

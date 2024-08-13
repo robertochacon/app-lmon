@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:hive/hive.dart';
 import 'package:lmon/screens/auth/register_screen.dart';
 import 'package:lmon/screens/main/home_screen.dart';
 import 'package:lmon/services/login.dart';
@@ -19,6 +20,19 @@ class _FormRequestState extends State<LoginScreen> {
   
   final GlobalKey<FormBuilderState> _formkey = GlobalKey<FormBuilderState>();
   final LoginService _loginService = LoginService();
+
+  _hive() async {
+    return await Hive.openBox('userBox');
+  }
+
+  void saveUserData(String token, String identification, String name, String email) async { 
+    _hive();
+    var box = Hive.box('userBox'); 
+    box.put('token', token);
+    box.put('identification', identification);
+    box.put('name', name);
+    box.put('email', email);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,6 +97,14 @@ class _FormRequestState extends State<LoginScreen> {
                       final response = await _loginService.login(email, password);
 
                       if (response['access_token']['token'] != null) {
+
+                        saveUserData(
+                          response['access_token']['token'], 
+                          response['access_token']['user']['identification'],
+                          response['access_token']['user']['name'],
+                          response['access_token']['user']['email']
+                        );
+
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(builder: (context) => const HomeScreen()),
@@ -98,6 +120,7 @@ class _FormRequestState extends State<LoginScreen> {
                         const SnackBar(content: Text('Credenciales incorrectas', style: TextStyle(fontSize: 20),)),
                       );
                     }
+
                   }
 
                 },
