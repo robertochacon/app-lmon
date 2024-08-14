@@ -24,9 +24,8 @@ class _FormRequestState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.only(top: 50),
+      body: Center(
+        child: SingleChildScrollView(
           child: FormBuilder(
             key: _formkey,
             child: Center(
@@ -52,7 +51,22 @@ class _FormRequestState extends State<RegisterScreen> {
                         )
                       ]), 
                       icon: Icons.perm_identity, 
-                      keytype: TextInputType.emailAddress
+                      keytype: TextInputType.text
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 10, right: 10),
+                    child: FormBuilderCustom(
+                      name: 'Nombre', 
+                      obscureText: false, 
+                      hintText: 'Ingrese su nombre', 
+                      validator: FormBuilderValidators.compose([
+                        FormBuilderValidators.required(
+                          errorText: 'Nombre requerido'
+                        )
+                      ]), 
+                      icon: Icons.perm_identity, 
+                      keytype: TextInputType.text
                     ),
                   ),
                   Padding(
@@ -96,21 +110,27 @@ class _FormRequestState extends State<RegisterScreen> {
                         _formkey.currentState?.save();
           
                         final identification = _formkey.currentState?.value['Cedula'] ?? '';
+                        final name = _formkey.currentState?.value['Nombre'] ?? '';
                         final email = _formkey.currentState?.value['Correo'] ?? '';
                         final password = _formkey.currentState?.value['Clave'] ?? '';
           
                         try {
           
-                          final response = await _registerService.register(identification, email, password);
+                          final response = await _registerService.register(identification, name, email, password);
           
+                          print(response);
+                  
                           if (response['token'] != null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("Registrado correctamente.")),
+                            );
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(builder: (context) => const HomeScreen()),
                             );
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(response['message'])),
+                              const SnackBar(content: Text("No se pudo registrar.")),
                             );
                           }
                         } catch (e) {
@@ -147,9 +167,9 @@ class _FormRequestState extends State<RegisterScreen> {
                 ],
               ),
             ),
-          ),
-        ) 
-  
+          ) 
+          
+        ),
       )
     );
   }

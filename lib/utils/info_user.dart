@@ -1,7 +1,7 @@
 import 'package:hive/hive.dart';
 
 class InfoUser {
-  
+
   _hive() async {
     return await Hive.openBox('userBox');
   }

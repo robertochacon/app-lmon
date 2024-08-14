@@ -38,116 +38,121 @@ class _FormRequestState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: FormBuilder(
-        key: _formkey,
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(
-                height: 150,
-                child: Image.asset('assets/images/logo.png'),
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 10, right: 10),
-                child: FormBuilderCustom(
-                  name: 'Correo', 
-                  obscureText: false, 
-                  hintText: 'Ingrese su correo', 
-                  validator: FormBuilderValidators.compose([
-                    FormBuilderValidators.required(
-                      errorText: 'Correo requerido'
+      body: 
+      Center(
+        child: SingleChildScrollView(
+          child: 
+            FormBuilder(
+              key: _formkey,
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      height: 150,
+                      child: Image.asset('assets/images/logo.png'),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 10, right: 10),
+                      child: FormBuilderCustom(
+                        name: 'Correo', 
+                        obscureText: false, 
+                        hintText: 'Ingrese su correo', 
+                        validator: FormBuilderValidators.compose([
+                          FormBuilderValidators.required(
+                            errorText: 'Correo requerido'
+                          )
+                        ]), 
+                        icon: Icons.mail, 
+                        keytype: TextInputType.emailAddress
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 10, right: 10),
+                      child: FormBuilderCustom(
+                        name: 'Clave', 
+                        obscureText: true, 
+                        hintText: 'Ingrese su clave', 
+                        validator: FormBuilderValidators.compose([
+                          FormBuilderValidators.required(
+                            errorText: 'Clave requerida'
+                          )
+                        ]), 
+                        icon: Icons.key, 
+                        keytype: TextInputType.text
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    ElevatedButton(
+                      onPressed: () async {
+        
+                        if (_formkey.currentState?.validate() ?? false) {
+                          _formkey.currentState?.save();
+                          final email = _formkey.currentState?.value['Correo'] ?? '';
+                          final password = _formkey.currentState?.value['Clave'] ?? '';
+        
+                          try {
+        
+                            final response = await _loginService.login(email, password);
+        
+                            if (response['access_token']['token'] != null) {
+        
+                              saveUserData(
+                                response['access_token']['token'], 
+                                response['access_token']['user']['identification'],
+                                response['access_token']['user']['name'],
+                                response['access_token']['user']['email']
+                              );
+        
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(builder: (context) => const HomeScreen()),
+                              );
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text(response['message'])),
+                              );
+                            }
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Credenciales incorrectas', style: TextStyle(fontSize: 20),)),
+                            );
+                          }
+        
+                        }
+        
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        minimumSize: const Size(200, 50),
+                      ),
+                      child: const Text("Iniciar", style: TextStyle(color: Colors.white, fontSize: 20),),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    ElevatedButton(
+                      onPressed: (){
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => const RegisterScreen()),
+                          );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue[200],
+                        minimumSize: const Size(200, 50),
+                      ),
+                      child: const Text("Registro", style: TextStyle(color: Colors.white, fontSize: 20),),
                     )
-                  ]), 
-                  icon: Icons.mail, 
-                  keytype: TextInputType.emailAddress
+                  ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.only(left: 10, right: 10),
-                child: FormBuilderCustom(
-                  name: 'Clave', 
-                  obscureText: true, 
-                  hintText: 'Ingrese su clave', 
-                  validator: FormBuilderValidators.compose([
-                    FormBuilderValidators.required(
-                      errorText: 'Clave requerida'
-                    )
-                  ]), 
-                  icon: Icons.key, 
-                  keytype: TextInputType.text
-                ),
-              ),
-              const SizedBox(
-                height: 5,
-              ),
-              ElevatedButton(
-                onPressed: () async {
-
-                  if (_formkey.currentState?.validate() ?? false) {
-                    _formkey.currentState?.save();
-                    final email = _formkey.currentState?.value['Correo'] ?? '';
-                    final password = _formkey.currentState?.value['Clave'] ?? '';
-
-                    try {
-
-                      final response = await _loginService.login(email, password);
-
-                      if (response['access_token']['token'] != null) {
-
-                        saveUserData(
-                          response['access_token']['token'], 
-                          response['access_token']['user']['identification'],
-                          response['access_token']['user']['name'],
-                          response['access_token']['user']['email']
-                        );
-
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (context) => const HomeScreen()),
-                        );
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(response['message'])),
-                        );
-                      }
-                    } catch (e) {
-                      print(e);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Credenciales incorrectas', style: TextStyle(fontSize: 20),)),
-                      );
-                    }
-
-                  }
-
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  minimumSize: const Size(200, 50),
-                ),
-                child: const Text("Iniciar", style: TextStyle(color: Colors.white, fontSize: 20),),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              ElevatedButton(
-                onPressed: (){
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => const RegisterScreen()),
-                    );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue[200],
-                  minimumSize: const Size(200, 50),
-                ),
-                child: const Text("Registro", style: TextStyle(color: Colors.white, fontSize: 20),),
-              )
-            ],
-          ),
+            ) 
         ),
       ) 
  

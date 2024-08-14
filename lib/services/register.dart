@@ -5,13 +5,20 @@ class RegisterService {
 
   final String apiUrl = 'http://192.168.100.5:8000/api/register';
 
-  Future<Map<String, dynamic>> register(String identification, String email, String password) async {
+  Future<Map<String, dynamic>> register(String identification, String name, String email, String password) async {
     try {
       final response = await http.post(
         Uri.parse(apiUrl),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'identification': identification, 'email': email, 'password': password, 'password_confirmation': password}),
+        body: jsonEncode({
+          "identification": "40236282889",
+          "name": "John Doe",
+          "email": "j344n.doe@exampuue.com",
+          "password": "password123"
+        }),
       );
+
+      print(response);
 
       if (response.statusCode == 200) {
         return jsonDecode(response.body);

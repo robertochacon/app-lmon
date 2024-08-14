@@ -1,7 +1,7 @@
 import 'package:lmon/screens/auth/login_screen.dart';
-import 'package:lmon/views/requests.dart';
-import 'package:lmon/views/calculator.dart';
-import 'package:lmon/views/profile.dart';
+import 'package:lmon/views/requests/requests.dart';
+import 'package:lmon/views/calculator/calculator.dart';
+import 'package:lmon/views/profile/profile.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -24,8 +24,9 @@ class _HomeScreenState extends State<HomeScreen> {
     ];
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('HomeScreen', style: TextStyle(color: Colors.white),),
+        title: const Text('LMON', style: TextStyle(color: Colors.white),),
         backgroundColor: Colors.blue,
         elevation: 10,
         iconTheme: const IconThemeData(
